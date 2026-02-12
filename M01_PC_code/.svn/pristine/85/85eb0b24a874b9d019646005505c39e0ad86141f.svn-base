@@ -1,0 +1,14 @@
+release/qrc_res.o
+release/main.o
+release/mainwindow.o
+release/threadcom.o
+release/processingdata.o
+release/machine.o
+release/MyChartView.o
+release/switchcom.o
+release/automatchexplain.o
+release/moc_mainwindow.o
+release/moc_threadcom.o
+release/moc_processingdata.o
+release/moc_switchcom.o
+release/moc_automatchexplain.o

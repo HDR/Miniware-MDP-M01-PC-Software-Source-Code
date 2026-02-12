@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/pic">
+        <file>app.ico</file>
+        <file>logo.png</file>
+        <file>P905AutoMatch.jpg</file>
+        <file>ui.qm</file>
+    </qresource>
+    <qresource prefix="/"/>
+    <qresource prefix="/ico">
+        <file>ico/left.png</file>
+        <file>ico/right.png</file>
+        <file>ico/left_hide.png</file>
+        <file>ico/left_press.png</file>
+        <file>ico/right_hide.png</file>
+        <file>ico/right_press.png</file>
+        <file>ico/lock.png</file>
+        <file>ico/unlock.png</file>
+    </qresource>
+    <qresource prefix="/font">
+        <file>font/RobotoMono-Italic.ttf</file>
+    </qresource>
+</RCC>

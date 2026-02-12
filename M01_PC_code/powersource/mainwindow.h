@@ -1,0 +1,297 @@
+﻿#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include "threadcom.h"
+#include "machine.h"
+#include "processingdata.h"
+#include <QLineEdit>
+#include <QLabel>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QAreaSeries>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QSplineSeries>
+#include "MyChartView.h"
+#include <QPushButton>
+#include <QButtonGroup>
+#include <QDoubleSpinBox>
+#include <QTimer>
+#include <QSplashScreen>
+#include <QTranslator>
+#include "switchcom.h"
+#include "automatchexplain.h"
+#include <math.h>
+#include <QMessageBox>
+#include <QFontDatabase>
+
+
+//msvc编译需要
+//#include <windows.h>
+//#pragma comment(lib, "user32.lib")
+//#pragma execution_character_set("utf-8")
+
+namespace Ui {
+class MainWindow;
+}
+
+QT_CHARTS_USE_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+signals:
+    //信号 打开串口
+    void signalOpenCom(QString,QString);
+    //信号关闭串口
+    void signalCloseCom();
+
+//====================================发送信号给数据处理=====================
+    //信号:发送地址
+    void signalSendAddr(int);
+    //信号:发送全部地址
+    void signalSendAllAddr();
+    //发送默认电压/电流
+    void signalSendDefualtVolta(int);
+    void signalSendDefualtElect(int);
+    //开启/关闭自动匹配功能
+    void signalSendStartAutoMatch();
+    void signalSendStopAutoMatch();
+    //开启关闭LED闪灯
+    void signalSendStartRGB();
+    void signalSendStopRGB();
+    //发送设置输出开关的状态
+    void signalSendSetoutPutState(int);
+    //读取所有地址到电脑
+    void signalSendReadAllAddrToPc();
+    //清除波形图
+    void signalSendCleanWave();
+    //暂停刷新波形图
+    void signalSendWaitWave(bool);
+    //停止刷新波形图
+    void signalSendStopWave();
+    //设置通道
+    void signalSendSetNowCh(char);
+    //复位到DFU
+    void signalSendToDfu();
+    //发送心跳包
+    void signalSendHeartBeat();
+    //获取设备类型
+    void signalGetMachineType();
+public:
+    //软件版本,版本更新修改
+    const QString softwareVersion = "V1.0.0";
+    //构造函数
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+
+    bool eventFilter(QObject *obj,QEvent *event);
+
+    //运动窗口定时器
+    QTimer runWindwoQtime;
+
+    //语言选择
+    enum  language
+    {
+      nola = 0,
+      en = 1,
+      cn = 2
+    };
+
+    //设置语言
+    void setLanguage(language la);
+    //从文件里面读取语言
+    language readLanguageFormFile();
+    //将语言写到配置文件
+    void writeLanguageToFile(language);
+    //浮点型转u16
+    static uint16_t doubleToInt(double d);
+public slots:
+    //设置当前通道 显示到ui
+    void slotSetChToUi(int);
+    //240模块错误
+    void slotErr240();
+    //报错提示
+    void slotErrTips(bool err);
+    //心跳包定时器。
+    void slotheartbeatTime();
+
+    void slotRunWindowTime();
+    //更新实时数据到界面。
+    void slotUpdatDataToUi();
+    //删除地址,设置地址
+    void slotQButtonGroupDelAddr(int);
+    void slotQButtonGroupSetAddr(int);
+    //设置电压电流
+    void slotQButtonGroupSetDefaultVolta(int);
+    void slotQButtonGroupSetDefaultElect(int);
+    //设置输出状态。
+    void slotQButtonGroupSetOutputState(int);
+    //判断端口是否打开。
+    void slotOpenComisOk(bool);
+    //更新地址到界面。
+    void slotUpdatUiaddr();
+    //批量设置定时器。
+    void slotbatchSetQTimer();
+    //没有收到数据警告。
+    void slotNoPack(bool);
+
+    //复位DFU
+    //void slotMenuToDfu(bool);
+    //扫描端口
+    //void slotScanCom(bool);
+    //显示波形图，电压，电流，标签。
+    void slotShowWaveLableV(const QPointF &, bool);
+    void slotShowWaveLableI(const QPointF &, bool);
+
+
+    //获取机械类型
+    void slotGetMachineType();
+    //设置机械类型。
+    void slotSetMachineType();
+    //扫描端口
+    bool scanComList();
+
+    //延时拔出检测
+    void slotDelayOutQtimer();
+private:
+    Ui::MainWindow *ui;
+    AutoMatchExplain autoMatchExplain;
+
+    QLabel showWaveLabelV;
+    QLabel showWaveLabelI;
+
+    switchCom swComForm;
+    //批量设置操作标志位。
+    bool atchSetV = false;
+    bool atchSetI = false;
+    bool atchSetOut = false;
+    bool atchSetClose = false;
+    //表示没有开启
+    bool autoMachFlag = false;
+
+    bool RGBFlag = false;
+    threadCom thrCom;
+
+    bool regUSBEvent();
+
+    threadCom baseCom;
+    processingData proData;
+
+    //将一些控件指针放到数组里面方便循环操作
+    void uiToArry();
+
+    void readAddrFormFile();
+    void writeAddrtoFile();
+
+    bool connectAll();
+
+
+
+    //清除全部的ui界面 恢复
+    void cleanAllUi();
+
+
+
+    //界面数据显示定时器
+    int updatDataToUiQTimertim = 1000;
+    QTimer updatDataToUiQTimer;
+
+    QTimer autoMatchGetAddr;
+
+    QTimer batchSetQTimer;
+
+    QTimer heartbeatQTimer;
+
+    int batchSetQTimertime = 200;
+    //true 表示拔出了 false 表示插入
+    void devIsPull(bool);
+
+    void UiInit();
+
+    void bootAnimation(bool);
+
+    QLabel showNowCh;
+
+//====================延时拔出检测=============
+    //当当前打开的串口被拔出的时候,启动定时器, 延时一段时间如果都没有重新连接,则刷新界面
+    QTimer delayOutQtimer;
+    int delayOutTime = 2000; //delayOutTime 毫秒检测一次
+    const uint32_t delayOutCount = 3;  //delayOutCount次都检测不到重新连接就刷新界面断开
+    bool delayOutFlag = false;      //当前是否延时拔出检测 真为等待再次插入,假为首次插入
+//============================================
+    QButtonGroup QButtonGroupDelAddr;
+    QButtonGroup QButtonGroupSetAddr;
+
+    QButtonGroup QButtonGroupsetDefaultVolta;
+    QButtonGroup QButtonGroupsetDefaultElect;
+
+    QButtonGroup QButtonGroupSetoutPutState;
+//=====================波形相关=================
+    QChart *chart;
+//    QSplineSeries  *series_V;
+//    QSplineSeries  *series_I;
+
+    QValueAxis *axisX  ;        //坐标轴
+    QValueAxis *axisY_V;
+    QValueAxis *axisY_I;
+
+    MyChartView *chartview;
+    //波型图窗口初始化。
+    void waveWidgetInit();
+
+//============界面UI数组===========
+    QLineEdit *addrQLineEditArry[6];
+    QLineEdit *freqQLineEditArry[6];
+//pushButtonDelAddr_1
+    QLabel *showQLabelArry[6][9];
+
+    QPushButton *addrDelQPushButtonArry[6];
+    QPushButton *addrSetQPushButtonArry[6];
+
+    QDoubleSpinBox *defaultVoltageQDoubleSpinBox[6];
+    QDoubleSpinBox *defaultElectQDoubleSpinBox[6];
+
+    QPushButton *defaultVoltageQPushButtonArry[6];
+    QPushButton *defaultElectQPushButtonArry[6];
+
+    QPushButton *setOutputStateArry[6];
+
+    QMessageBox *errDialog1;    //中文
+    QMessageBox *errDialog2;    //英文
+
+    int fontId[16];
+    QStringList fontName;
+
+//=====================================
+    void autoMachUiSet(bool);
+protected:
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+    void closeEvent(QCloseEvent* event);
+    void paintEvent(QPaintEvent *e);
+private slots:
+    void on_pushButtonStartAutoMach_clicked();
+    void slotSetAllAddr();
+    void on_pushButtonRGB_clicked();
+    void on_pushButtonReadAllAddrToPc_clicked();
+    void slotDelAllAddr();
+    void on_pushButtonCleanWave_clicked();
+    void on_pushButtonSaveWave_clicked();
+    void on_pushButtonWaitWave_clicked();
+    void on_comboBoxSelectCh_currentIndexChanged(int index);
+
+    void on_pushButtonOpenAll_clicked();
+    void on_pushButtonCloseAll_clicked();
+    void on_pushButtonSetAllV_clicked();
+    void on_pushButtonSetAllI_clicked();
+    void on_tabWidgetSetVI_currentChanged(int index);
+    void on_tabWidgetAddr_currentChanged(int index);
+    void on_actionchina_triggered(bool checked);
+    void on_actionEnglish_triggered(bool checked);
+    void on_action_triggered(bool checked);
+    void on_actionVer_triggered(bool checked);
+    void on_actionUptoDFU_triggered();
+    void on_actionScanCom_triggered();
+};
+
+#endif // MAINWINDOW_H

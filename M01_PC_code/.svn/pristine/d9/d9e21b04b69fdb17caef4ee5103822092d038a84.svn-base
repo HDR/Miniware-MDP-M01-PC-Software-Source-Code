@@ -1,0 +1,14 @@
+#include "automatchexplain.h"
+#include "ui_automatchexplain.h"
+
+AutoMatchExplain::AutoMatchExplain(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::AutoMatchExplain)
+{
+    ui->setupUi(this);
+}
+
+AutoMatchExplain::~AutoMatchExplain()
+{
+    delete ui;
+}

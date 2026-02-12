@@ -1,0 +1,73 @@
+﻿
+#include "switchcom.h"
+#include "ui_switchcom.h"
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QDebug>
+
+
+switchCom::switchCom(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::switchCom)
+{
+    ui->setupUi(this);
+
+    this->setFixedSize(this->width(),this->height());
+
+
+}
+
+switchCom::~switchCom()
+{
+    delete ui;
+}
+
+void switchCom::on_pushButtonScanCom_clicked()
+{
+    const auto infos = QSerialPortInfo::availablePorts();
+
+    QString description, manufacturer, serialNumber;
+    ui->comboBoxCom->clear();
+    for(const QSerialPortInfo &info : infos)
+    {
+        static const char blankString[] = QT_TRANSLATE_NOOP("SettingsDialog", "N/A");
+        QStringList list;
+
+        description = info.description();
+
+        manufacturer = info.manufacturer();
+
+        serialNumber = info.serialNumber();
+        list << info.portName()
+             << (!description.isEmpty() ? description : blankString)
+             << (!manufacturer.isEmpty() ? manufacturer : blankString)
+             << (!serialNumber.isEmpty() ? serialNumber : blankString)
+             << info.systemLocation()
+             << (info.vendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : blankString)
+             <<(info.productIdentifier() ? QString::number(info.productIdentifier(), 16) : blankString);
+
+        //qDebug() << list;
+        //"STMicroel"
+        //找到了复合条件的串口
+        //if(manufacturer.indexOf("STMicroel") != -1)
+        //{
+            //发送信号打开串口
+            //emit signalOpenCom(info.portName(),info.serialNumber());
+
+        //}
+        //增加到下拉框
+        ui->comboBoxCom->addItem(info.portName(),info.serialNumber());
+    }
+}
+
+void switchCom::on_pushButtonOpenCom_clicked()
+{
+    emit signalOpenCom(ui->comboBoxCom->currentText(),ui->comboBoxCom->currentData().toString());
+    this->hide();
+}
+
+void switchCom::showEvent(QShowEvent *event)
+{
+    ui->retranslateUi(this);
+    QWidget::showEvent(event);
+}

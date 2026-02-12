@@ -1,0 +1,14 @@
+debug/qrc_res.o
+debug/main.o
+debug/mainwindow.o
+debug/threadcom.o
+debug/processingdata.o
+debug/machine.o
+debug/MyChartView.o
+debug/switchcom.o
+debug/automatchexplain.o
+debug/moc_mainwindow.o
+debug/moc_threadcom.o
+debug/moc_processingdata.o
+debug/moc_switchcom.o
+debug/moc_automatchexplain.o
